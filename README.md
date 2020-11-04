@@ -5,13 +5,13 @@ React Native implementation of My2c2pSDK
 ## Installation
 
 ```sh
-npm install react-native-my2c2p-sdk
+npm install @corelmax/react-native-my2c2p-sdk
 ```
 
 ## Usage
 
 ```js
-import My2c2pSdk from "react-native-my2c2p-sdk";
+import My2c2pSdk from "@corelmax/react-native-my2c2p-sdk";
 
 // ...
 
