@@ -1,29 +1,28 @@
 import { NativeModules } from 'react-native';
 
-
 const { RNMy2c2pSdk } = NativeModules;
 
 type PaymentRequest = {
-  request3DS: 'Y' | 'N'
-  paymentUI: boolean
-  storeCard: false
-  payCategoryID: string
-  userDefined1: string
-  userDefined2: string
-  userDefined3: string
-  userDefined4: string
-  userDefined5: string
-}
+  request3DS: 'Y' | 'N';
+  paymentUI: boolean;
+  storeCard: false;
+  payCategoryID: string;
+  userDefined1: string;
+  userDefined2: string;
+  userDefined3: string;
+  userDefined4: string;
+  userDefined5: string;
+};
 
-type PaymentRequestFunction = (params: PaymentRequest) => void
+type PaymentRequestFunction = (params: PaymentRequest) => void;
 
 type RNMy2c2pSdkType = {
-  init: (privateKey: string, production: boolean) => void
-  requestPayment: PaymentRequestFunction
-  requestRecurringPayment: PaymentRequestFunction
-  requestInstallmentPayment: PaymentRequestFunction
-  requestAlternativePayment: PaymentRequestFunction
-  requestPaymentChannel: PaymentRequestFunction
+  init: (privateKey: string, production: boolean) => void;
+  requestPayment: PaymentRequestFunction;
+  requestRecurringPayment: PaymentRequestFunction;
+  requestInstallmentPayment: PaymentRequestFunction;
+  requestAlternativePayment: PaymentRequestFunction;
+  requestPaymentChannel: PaymentRequestFunction;
 };
 
 const defaultPaymentRequest: PaymentRequest = {
@@ -35,36 +34,36 @@ const defaultPaymentRequest: PaymentRequest = {
   userDefined2: '',
   userDefined3: '',
   userDefined4: '',
-  userDefined5: ''
+  userDefined5: '',
 };
 
 export default {
-  init: function(privateKey: string, production: boolean) {
+  init: function (privateKey: string, production: boolean) {
     RNMy2c2pSdk.setup(privateKey, production);
   },
 
-  requestPayment: function(params: PaymentRequest) {
+  requestPayment: function (params: PaymentRequest) {
     var payment = Object.assign({}, defaultPaymentRequest, params);
     return RNMy2c2pSdk.requestPayment(payment);
   },
 
-  requestRecurringPayment: function(params: PaymentRequest) {
+  requestRecurringPayment: function (params: PaymentRequest) {
     var payment = Object.assign({}, defaultPaymentRequest, params);
     return RNMy2c2pSdk.requestRecurringPayment(payment);
   },
 
-  requestInstallmentPayment: function(params: PaymentRequest) {
+  requestInstallmentPayment: function (params: PaymentRequest) {
     var payment = Object.assign({}, defaultPaymentRequest, params);
     return RNMy2c2pSdk.requestInstallmentPayment(payment);
   },
 
-  requestAlternativePayment: function(params: PaymentRequest) {
+  requestAlternativePayment: function (params: PaymentRequest) {
     var payment = Object.assign({}, defaultPaymentRequest, params);
     return RNMy2c2pSdk.requestAlternativePayment(payment);
   },
 
-  requestPaymentChannel: function(params: PaymentRequest) {
+  requestPaymentChannel: function (params: PaymentRequest) {
     var payment = Object.assign({}, defaultPaymentRequest, params);
     return RNMy2c2pSdk.requestPaymentChannel(payment);
-  }
+  },
 } as RNMy2c2pSdkType;
