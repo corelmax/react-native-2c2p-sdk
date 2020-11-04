@@ -1,77 +1,9 @@
-
-#import "React/RCTLog.h"
 #import "RNMy2c2pSdk.h"
 
 @implementation RNMy2c2pSdk
 
-- (dispatch_queue_t)methodQueue
-{
+- (dispatch_queue_t) methodQueue {
     return dispatch_get_main_queue();
-}
-RCT_EXPORT_MODULE();
-
-RCT_EXPORT_METHOD(setup: (NSString *)privateKey production: (BOOL)productionMode) {
-    RCTLogInfo(@"Initialize with params: production=%d", productionMode);
-    _my2c2pSDK = [[My2c2pSDK alloc] initWithPrivateKey:privateKey];
-    _my2c2pSDK.version = 9.0;
-    _my2c2pSDK.productionMode = productionMode;
-}
-
-RCT_EXPORT_METHOD(requestPayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-    RCTLogInfo(@"Request payment params: %@", params);
-
-    [self setMandatoryFields: params];
-    [self setCardInfoFields: params];
-    [self setOptionalFields: params];
-
-    [self sendRequestWithResolver: resolve rejecter: reject];
-}
-
-RCT_EXPORT_METHOD(requestRecurringPayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-    RCTLogInfo(@"Request recurring payment params: %@", params);
-
-    [self setMandatoryFields: params];
-    [self setCardInfoFields: params];
-    [self setRecurringFields: params];
-    [self setOptionalFields: params];
-
-    [self sendRequestWithResolver: resolve rejecter: reject];
-}
-
-RCT_EXPORT_METHOD(requestInstallmentPayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-    RCTLogInfo(@"Request installment payment params: %@", params);
-
-    [self setMandatoryFields: params];
-    [self setCardInfoFields: params];
-    [self setInstallmentFields: params];
-    [self setOptionalFields: params];
-
-    [self sendRequestWithResolver: resolve rejecter: reject];
-}
-
-RCT_EXPORT_METHOD(requestAlternativePayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-    RCTLogInfo(@"Request alternative payment params: %@", params);
-
-    [self setMandatoryFields: params];
-    [self setAlternativePaymentFields: params];
-    [self setOptionalFields: params];
-
-    [self sendRequestWithResolver: resolve rejecter: reject];
-}
-
-RCT_EXPORT_METHOD(requestPaymentChannel: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-    RCTLogInfo(@"Request payment channel payment params: %@", params);
-
-    [self setMandatoryFields: params];
-    [self setPaymentChannelFields: params];
-    [self setOptionalFields: params];
-
-    [self sendRequestWithResolver: resolve rejecter: reject];
 }
 
 - (void)setMandatoryFields: (NSDictionary *)params
@@ -136,18 +68,27 @@ RCT_EXPORT_METHOD(requestPaymentChannel: (NSDictionary *)params resolver:(RCTPro
     _my2c2pSDK.paymentChannel = [self paymentChannelFromString:params[@"paymentChannel"]];
 }
 
-- (int)paymentChannelFromString: (NSString *)string
+- (My2c2pPaymentChannel)paymentChannelFromString: (NSString *)string
 {
-    NSDictionary *paymentChannelDictionary =
-        @{@"MPU": [NSNumber numberWithInt:MPU],
-          @"UPOP": [NSNumber numberWithInt:UPOP],
-          @"ALIPAY": [NSNumber numberWithInt:ALIPAY],
-          @"ONE_TWO_THREE": [NSNumber numberWithInt:ONE_TWO_THREE],
-          @"MASTER_PASS": [NSNumber numberWithInt:MASTER_PASS],
-          @"APPLE_PAY": [NSNumber numberWithInt:APPLE_PAY],
-          @"QWIK": [NSNumber numberWithInt:QWIK],
-          @"LINE_PAY": [NSNumber numberWithInt:LINE_PAY]};
-    return [paymentChannelDictionary[string] intValue];
+    if([string isEqualToString:@"MPU"]) {
+        return MPU;
+    } else if([string isEqualToString:@"UPOP"]) {
+        return UPOP;
+    } else if([string isEqualToString:@"ALIPAY"]) {
+        return ALIPAY;
+    } else if([string isEqualToString:@"ONE_TWO_THREE"]) {
+        return ONE_TWO_THREE;
+    } else if([string isEqualToString:@"MASTER_PASS"]) {
+        return MASTER_PASS;
+    } else if([string isEqualToString:@"APPLE_PAY"]) {
+        return APPLE_PAY;
+    } else if([string isEqualToString:@"QWIK"]) {
+        return QWIK;
+    } else if([string isEqualToString:@"LINE_PAY"]) {
+        return LINE_PAY;
+    } else {
+        return CREDIT_CARD;
+    }
 }
 
 - (void)setOptionalFields: (NSDictionary *)params
@@ -176,7 +117,7 @@ RCT_EXPORT_METHOD(requestPaymentChannel: (NSDictionary *)params resolver:(RCTPro
 
         showingController = (UIViewController*)window.rootViewController;
     }
-    _my2c2pSDK.delegate = showingController;
+    _my2c2pSDK.delegate = (id<My2c2pSDKDelegate>) showingController;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [_my2c2pSDK requestWithTarget: showingController onResponse:^(NSDictionary *response)
@@ -210,5 +151,72 @@ RCT_EXPORT_METHOD(requestPaymentChannel: (NSDictionary *)params resolver:(RCTPro
     }
 }
 
-@end
+RCT_EXPORT_MODULE();
 
+RCT_EXPORT_METHOD(setup: (NSString *)privateKey
+                  withProductionMode: (BOOL)productionMode) {
+    RCTLogInfo(@"Initialize with params: production=%d", productionMode);
+    _my2c2pSDK = [[My2c2pSDK alloc] initWithPrivateKey:privateKey];
+    _my2c2pSDK.version = 9.0;
+    _my2c2pSDK.productionMode = productionMode;
+}
+
+RCT_EXPORT_METHOD(requestPayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    RCTLogInfo(@"Request payment params: %@", params);
+
+    [self setMandatoryFields: params];
+    [self setCardInfoFields: params];
+    [self setOptionalFields: params];
+
+    [self sendRequestWithResolver: resolve rejecter: reject];
+}
+
+RCT_EXPORT_METHOD(requestRecurringPayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    RCTLogInfo(@"Request recurring payment params: %@", params);
+
+    [self setMandatoryFields: params];
+    [self setCardInfoFields: params];
+    [self setRecurringFields: params];
+    [self setOptionalFields: params];
+
+    [self sendRequestWithResolver: resolve rejecter: reject];
+}
+
+RCT_EXPORT_METHOD(requestInstallmentPayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    RCTLogInfo(@"Request installment payment params: %@", params);
+
+    [self setMandatoryFields: params];
+    [self setCardInfoFields: params];
+    [self setInstallmentFields: params];
+    [self setOptionalFields: params];
+
+    [self sendRequestWithResolver: resolve rejecter: reject];
+}
+
+RCT_EXPORT_METHOD(requestAlternativePayment: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    RCTLogInfo(@"Request alternative payment params: %@", params);
+
+    [self setMandatoryFields: params];
+    [self setAlternativePaymentFields: params];
+    [self setOptionalFields: params];
+
+    [self sendRequestWithResolver: resolve rejecter: reject];
+}
+
+RCT_EXPORT_METHOD(requestPaymentChannel: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    RCTLogInfo(@"Request payment channel payment params: %@", params);
+
+    [self setMandatoryFields: params];
+    [self setPaymentChannelFields: params];
+    [self setOptionalFields: params];
+
+    [self sendRequestWithResolver: resolve rejecter: reject];
+}
+
+
+@end
