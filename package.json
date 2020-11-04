@@ -1,6 +1,6 @@
 {
   "name": "@corelmax/react-native-my2c2p-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React Native implementation of My2c2pSDK",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
